@@ -12,7 +12,7 @@ class Molecule:
         Pass parameters desribing molecules
         """
         #! name
-        self.name = name
+        self.name = name``
         #! Critical temperature (K)
         self.Tc = Tc
         #! Critical pressure (bar)
