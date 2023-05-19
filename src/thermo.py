@@ -3,15 +3,17 @@ from typing import List, Callable
 import matplotlib.pyplot as plt
 
 def ideal_gas_law(gas_constant: float, list_of_volumes: List, list_of_temperatures: List) -> pd.DataFrame:
-    """_summary_
+    """ A function that calculates the pressure of an ideal gas at a given temperature and volume.
 
     Args:
-        gas_constant (float): _description_
-        list_of_volumes (List): _description_
-        list_of_temperatures (List): _description_
+    ----
+        gas_constant (float): The gas constant - 8.3145 cm^3*MPa/mol*K
+        list_of_volumes (List): A list of molar volumes in cm^3mol^-1
+        list_of_temperatures (List): A list of temperatures in K
 
     Returns:
-        _type_: _description_
+    -------
+        pd.DataFrame: A DataFrame with the pressure (MPa) of an ideal gas at a given temperature and molar volume.
     """
     df = pd.DataFrame(columns=list_of_temperatures, index=list_of_volumes)
     df = df.apply(lambda x: (float(x.name) * gas_constant) / x.index)
@@ -21,6 +23,13 @@ def ideal_gas_law(gas_constant: float, list_of_volumes: List, list_of_temperatur
 # Plot Function for Task 2 - Ideal Gas Law
 
 def plot_ideal_gas_law(ideal_gas_law_df: pd.DataFrame) -> None:
+    """ A function that plots the pressure of an ideal gas at a given temperature and volume provided by a DataFrame.
+
+    Args:
+    ----
+        ideal_gas_law_df (pd.DataFrame): A DataFrame with the pressure (MPa) of an ideal gas at given temperatures and molar volumes.
+    """
+
     for column in ideal_gas_law_df:
         plt.plot(ideal_gas_law_df.index, ideal_gas_law_df[column], label=column)
     plt.ylim(0, 15)
@@ -29,6 +38,19 @@ def plot_ideal_gas_law(ideal_gas_law_df: pd.DataFrame) -> None:
 # Peng-Robinson EOS Function for Task 3
 
 def peng_robinson_eos(gas_constant: float, list_of_volumes: List, list_of_temperatures: List, bc: float, ac: float, alpha: Callable) -> pd.DataFrame:
+    """ A function that calculates the pressure of a gas at a given temperature and molar volume using the Peng-Robinson EOS.
+
+    Args:
+        gas_constant (float): 8.3145 cm^3*MPa/mol*K
+        list_of_volumes (List): List of molar volumes in cm^3mol^-1
+        list_of_temperatures (List): List of temperatures in K
+        bc (float): Value of b at the critical temperature
+        ac (float): Value of c at the critical temperature
+        alpha (Callable): Alpha function is a function of temperature that is used to calculate the acentric factor of the gas
+
+    Returns:
+        pd.DataFrame: A DataFrame with the pressure (MPa) of a gas at a given temperature and molar volume using the Peng-Robinson EOS.
+    """
     df = pd.DataFrame(columns=list_of_temperatures, index=list_of_volumes)
     temperature_aT = {T: (ac * alpha(T)) for T in list_of_temperatures}
     df = df.apply(lambda x: ((gas_constant * float(x.name)) / (x.index - bc)) - (temperature_aT[float(x.name)] / ((x.index * (x.index + bc) + bc * (x.index - bc)))), axis=0)
@@ -37,12 +59,20 @@ def peng_robinson_eos(gas_constant: float, list_of_volumes: List, list_of_temper
 # Plot Function for Task 4 - Peng-Robinson EOS
 
 def plot_peng_robinson_eos(peng_robinson_eos_df: pd.DataFrame) -> None:
+    """ A function that plots the pressure of a gas at a given temperature and molar volume provided by a DataFrame.
+
+    Args:
+        peng_robinson_eos_df (pd.DataFrame): A DataFrame with the pressure (MPa) of a gas at given temperatures and molar volumes using the Peng-Robinson EOS.
+    """
+    
     for column in peng_robinson_eos_df:
         plt.plot(peng_robinson_eos_df.index, peng_robinson_eos_df[column], label=column)
 
 # PLot Function for Task 6
 
 def plot_example_ideal_gas_law_and_peng_robinson_eos() -> None:
+    """A function that plots the pressure of an ideal gas and a gas using the Peng-Robinson EOS at a given temperature and molar volume provided by an example DataFrame.
+    """
     example = pd.read_csv('src/preos_df_example.csv', index_col=0)
     plot_peng_robinson_eos(example)
     plt.axhline(y=4.6, color='red', linestyle='--', label='$P^{0}$ at 284.0 K (Lit)')
@@ -55,6 +85,16 @@ def plot_example_ideal_gas_law_and_peng_robinson_eos() -> None:
 
 
 def get_chemical_values(chemical_df: pd.DataFrame, molecules: List, column: str) -> List:
+    """ A function that returns the values of a column for a list of molecules.
+
+    Args:
+        chemical_df (pd.DataFrame): A DataFrame with the chemical values of molecules
+        molecules (List): A list of molecules
+        column (str): The column of the DataFrame to be returned
+
+    Returns:
+        List: A list of values of the column for the molecules
+    """
     if column not in chemical_df.columns:
         raise ValueError('Column not in DataFrame. Did you input the correct column name?')
     elif molecules is None:
@@ -71,15 +111,15 @@ def get_chemical_values(chemical_df: pd.DataFrame, molecules: List, column: str)
 
 # Calculate ai for Task 7.1.1
 def calculate_ai(chemical_df: pd.DataFrame, molecules: List, temperature: float) -> List:
-    """_summary_
+    """ A function that calculates the ai values for a list of molecules at a given temperature.
 
     Args:
-        chemical_df (pd.DataFrame): _description_
-        molecules (List): _description_
-        temperature (float): _description_
+        chemical_df (pd.DataFrame): A DataFrame with the chemical values of molecules
+        molecules (List): Molecules to calculate ai values for
+        temperature (float): Temperature in K
 
     Returns:
-        List: _description_
+        List: A list of ai values for the molecules
     """
     if temperature <= 0:
         raise ValueError('Temperature must be greater than 0.')
